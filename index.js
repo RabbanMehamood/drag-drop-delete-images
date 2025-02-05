@@ -88,13 +88,11 @@ function drop(ev) {
 
   if (!draggedElement) return;
 
-  // If dropping in delete section (left)
   if (
     ev.target.id === "imgDeleteDisplay" ||
     ev.target.closest("#imgDeleteDisplay")
   ) {
     if (draggedElement.tagName === "IMG") {
-      // If there's already an image in delete section, move it back to right side
       if (previousImage) {
         const prevImgId = previousImage.id.replace("dragImg", "");
         document
@@ -102,14 +100,12 @@ function drop(ev) {
           .appendChild(previousImage);
       }
 
-      imgDeleteDisplay.innerHTML = ""; // Clear previous content
-      previousImage = draggedElement; // Store the new image in delete section
+      imgDeleteDisplay.innerHTML = "";
+      previousImage = draggedElement;
 
-      // Wrap the image inside a div
       const wrapperDiv = document.createElement("div");
       wrapperDiv.appendChild(draggedElement);
 
-      // Create delete button
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
       deleteBtn.style.width = "130px";
@@ -126,7 +122,6 @@ function drop(ev) {
         previousImage = null;
       });
 
-      // Create cancel button
       const cancelBtn = document.createElement("button");
       cancelBtn.textContent = "Cancel";
       cancelBtn.style.marginLeft = "10px";
@@ -138,7 +133,6 @@ function drop(ev) {
         previousImage = null;
       });
 
-      // Create resize slider
       const sizeSlider = document.createElement("input");
       sizeSlider.setAttribute("type", "range");
       sizeSlider.setAttribute("min", "50");
@@ -155,15 +149,12 @@ function drop(ev) {
       imgDeleteDisplay.appendChild(deleteBtn);
       imgDeleteDisplay.appendChild(cancelBtn);
     }
-  }
-  // If dropping back into grid (right)
-  else if (ev.target.classList.contains("img-div-style")) {
+  } else if (ev.target.classList.contains("img-div-style")) {
     ev.target.appendChild(draggedElement);
-    previousImage = null; // Reset previous image since it's moved back
+    previousImage = null;
   }
 }
 
-// Attach event listeners
 imgDeleteDisplay.addEventListener("dragover", allowDrop);
 imgDeleteDisplay.addEventListener("drop", drop);
 contImgsDisplay.addEventListener("dragover", allowDrop);
