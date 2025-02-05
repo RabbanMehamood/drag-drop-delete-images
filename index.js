@@ -1,209 +1,170 @@
-// const rowEl = document.getElementById("rowId");
-// const colEl = document.getElementById("columnId");
-// const addBtn = document.getElementById("addBoxes");
-// const contImgsDisplay = document.getElementById("contImgsDisplay");
-// const imgDeleteDisplay = document.getElementById("imgDeleteDisplay");
-
-// addBtn.addEventListener("click", () => {
-//   contImgsDisplay.innerHTML = "";
-//   contImgsDisplay.style.gridTemplateRows = `repeat(${rowEl.value}, 1fr)`;
-//   contImgsDisplay.style.gridTemplateColumns = `repeat(${colEl.value}, 1fr)`;
-//   createMatrix(rowEl.value, colEl.value);
-// });
-
-// function createMatrix(rowvalue, colvalue) {
-//   let rows = rowvalue;
-//   let cols = colvalue;
-//   const nImgDivs = rows * cols;
-
-//   // ondragstart = "drag(event)";
-
-//   for (let i = 1; i <= nImgDivs; i++) {
-//     const imgDiv = document.createElement("div");
-//     imgDiv.setAttribute("ondragstart", "drag(event)");
-//     imgDiv.setAttribute("draggable", "true");
-//     imgDiv.setAttribute("id", `imgDiv${i}`);
-//     imgDiv.classList.add("img-div-style");
-
-//     // create img preview
-//     const imgPreview = document.createElement("div");
-//     imgPreview.setAttribute("id", `imgPreview${i}`);
-//     imgPreview.style.display = "none";
-
-//     // creating an empty div to choose file
-//     const emptyDiv = document.createElement("input");
-//     emptyDiv.setAttribute("type", "file");
-//     emptyDiv.setAttribute("id", `emptyDiv${i}`);
-//     emptyDiv.setAttribute("accept", "image/*");
-//     emptyDiv.addEventListener("change", function () {
-//       getImgData(i);
-//     });
-//     imgDiv.appendChild(emptyDiv);
-//     imgDiv.appendChild(imgPreview);
-//     contImgsDisplay.appendChild(imgDiv);
-//   }
-
-//   const rightSection = document.querySelector(".right-section");
-//   console.log(rightSection);
-// }
-
-// function getImgData(i) {
-//   const files = document.getElementById(`emptyDiv${i}`).files[0];
-//   if (files) {
-//     const fileReader = new FileReader();
-//     fileReader.readAsDataURL(files);
-//     fileReader.addEventListener("load", function () {
-//       document.getElementById(`emptyDiv${i}`).style.display = "none";
-//       document.getElementById(`imgPreview${i}`).style.display = "block";
-//       document.getElementById(`imgPreview${i}`).innerHTML =
-//         '<img src="' + this.result + '" class="imgStyle" />';
-//     });
-//     document
-//       .getElementById(`imgPreview${i}`)
-//       .setAttribute("ondragstart", "drag(event)");
-//     document.getElementById(`imgPreview${i}`).setAttribute("draggable", "true");
-//   }
-// }
-
-// function allowDrop(ev) {
-//   ev.preventDefault();
-// }
-
-// function drag(ev) {
-//   ev.dataTransfer.setData("text", ev.target.id);
-// }
-
-// function drop(ev) {
-//   ev.preventDefault();
-//   var data = ev.dataTransfer.getData("text");
-//   ev.target.appendChild(document.getElementById(data));
-// }
-
-// const deleteBtn = document.createElement("button");
-// deleteBtn.style.display = "inline";
-// deleteBtn.style.width = "130px";
-// deleteBtn.textContent = "Delete";
-// deleteBtn.addEventListener("click", function () {
-//   document.getElementById(`emptyDiv${i}`).value = "";
-//   document.getElementById(`emptyDiv${i}`).style.display = "block";
-//   document.getElementById(`imgPreview${i}`).style.display = "none";
-//   document.getElementById(`imgPreview${i}`).innerHTML = "";
-//   imgDiv.appendChild(deleteBtn);
-// });
 const rowEl = document.getElementById("rowId");
 const colEl = document.getElementById("columnId");
 const addBtn = document.getElementById("addBoxes");
 const contImgsDisplay = document.getElementById("contImgsDisplay");
 const imgDeleteDisplay = document.getElementById("imgDeleteDisplay");
 
+let previousImage = null; // Store reference of existing left-side image
+
+contImgsDisplay.style.display = "grid";
+contImgsDisplay.style.gap = "5px";
+
 addBtn.addEventListener("click", () => {
+  const rows = parseInt(rowEl.value, 10) || 1;
+  const cols = parseInt(colEl.value, 10) || 1;
+
   contImgsDisplay.innerHTML = "";
-  contImgsDisplay.style.gridTemplateRows = `repeat(${rowEl.value}, 1fr)`;
-  contImgsDisplay.style.gridTemplateColumns = `repeat(${colEl.value}, 1fr)`;
-  createMatrix(rowEl.value, colEl.value);
+  contImgsDisplay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  contImgsDisplay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  createMatrix(rows, cols);
 });
 
-function createMatrix(rowvalue, colvalue) {
-  let rows = rowvalue;
-  let cols = colvalue;
+function createMatrix(rows, cols) {
   const nImgDivs = rows * cols;
 
   for (let i = 1; i <= nImgDivs; i++) {
     const imgDiv = document.createElement("div");
     imgDiv.setAttribute("id", `imgDiv${i}`);
     imgDiv.classList.add("img-div-style");
+    imgDiv.setAttribute("ondrop", "drop(event)");
+    imgDiv.setAttribute("ondragover", "allowDrop(event)");
 
-    // create img preview
     const imgPreview = document.createElement("div");
     imgPreview.setAttribute("id", `imgPreview${i}`);
     imgPreview.style.display = "none";
 
-    // creating an empty div to choose file
-    const emptyDiv = document.createElement("input");
-    emptyDiv.setAttribute("type", "file");
-    emptyDiv.setAttribute("id", `emptyDiv${i}`);
-    emptyDiv.setAttribute("accept", "image/*");
-    emptyDiv.addEventListener("change", function () {
+    const fileInput = document.createElement("input");
+    fileInput.setAttribute("type", "file");
+    fileInput.setAttribute("id", `emptyDiv${i}`);
+    fileInput.setAttribute("accept", "image/*");
+    fileInput.addEventListener("change", function () {
       getImgData(i);
     });
-    imgDiv.appendChild(emptyDiv);
+
+    imgDiv.appendChild(fileInput);
     imgDiv.appendChild(imgPreview);
     contImgsDisplay.appendChild(imgDiv);
   }
 }
 
 function getImgData(i) {
-  const files = document.getElementById(`emptyDiv${i}`).files[0];
-  if (files) {
+  const fileInput = document.getElementById(`emptyDiv${i}`);
+  const file = fileInput.files[0];
+
+  if (file) {
     const fileReader = new FileReader();
-    fileReader.readAsDataURL(files);
-    fileReader.addEventListener("load", function () {
-      document.getElementById(`emptyDiv${i}`).style.display = "none";
-      document.getElementById(`imgPreview${i}`).style.display = "block";
-      document.getElementById(`imgPreview${i}`).innerHTML =
-        '<img src="' + this.result + '" class="imgStyle" />';
+    fileReader.readAsDataURL(file);
 
-      // Make the image draggable
+    fileReader.onload = function () {
       const imgPreview = document.getElementById(`imgPreview${i}`);
-      const imgElement = imgPreview.querySelector("img");
-      imgElement.setAttribute("draggable", "true");
+      fileInput.style.display = "none";
+      imgPreview.style.display = "block";
 
-      // Add event listener for dragstart
+      imgPreview.innerHTML = `<img src="${this.result}" class="imgStyle" id="dragImg${i}" draggable="true" />`;
+      const imgElement = imgPreview.querySelector("img");
+
       imgElement.addEventListener("dragstart", function (event) {
         drag(event);
       });
-    });
+
+      fileInput.value = "";
+    };
   }
 }
 
 function allowDrop(ev) {
-  ev.preventDefault(); // Prevent default to allow drop
+  ev.preventDefault();
 }
 
 function drag(ev) {
-  ev.dataTransfer.setData("text", ev.target.id); // Store the dragged element's id
+  ev.dataTransfer.setData("text", ev.target.id);
 }
 
 function drop(ev) {
-  ev.preventDefault(); // Prevent the default behavior of the drop event
-  var data = ev.dataTransfer.getData("text"); // Get the dragged element's id
-  const draggedElement = document.getElementById(data); // Get the dragged div element
+  ev.preventDefault();
+  const draggedId = ev.dataTransfer.getData("text");
+  const draggedElement = document.getElementById(draggedId);
 
-  // Check if the drop target is the delete display (left section)
-  if (ev.target.id === "imgDeleteDisplay") {
-    // Ensure the dragged element is a valid div that contains an image
-    if (draggedElement && draggedElement.querySelector("img")) {
-      // Only append if the left section is empty (to prevent multiple images)
-      if (!imgDeleteDisplay.contains(draggedElement)) {
-        // Clear previous content in delete section (ensure only one image is there)
-        imgDeleteDisplay.innerHTML = "";
+  if (!draggedElement) return;
 
-        // Append the dragged image to the delete display
-        imgDeleteDisplay.appendChild(draggedElement);
-
-        // Create a delete button
-        const deleteBtn = document.createElement("button");
-        deleteBtn.style.display = "inline";
-        deleteBtn.style.width = "130px";
-        deleteBtn.textContent = "Delete";
-
-        // Add event listener to the delete button
-        deleteBtn.addEventListener("click", function () {
-          const imgId = draggedElement.id.replace("imgDiv", ""); // Extract the index
-          document.getElementById(`emptyDiv${imgId}`).value = "";
-          document.getElementById(`emptyDiv${imgId}`).style.display = "block";
-          document.getElementById(`imgPreview${imgId}`).style.display = "none";
-          document.getElementById(`imgPreview${imgId}`).innerHTML = "";
-          imgDeleteDisplay.innerHTML = ""; // Clear the delete section
-        });
-
-        // Append the delete button to the imgDeleteDisplay
-        imgDeleteDisplay.appendChild(deleteBtn);
+  // If dropping in delete section (left)
+  if (
+    ev.target.id === "imgDeleteDisplay" ||
+    ev.target.closest("#imgDeleteDisplay")
+  ) {
+    if (draggedElement.tagName === "IMG") {
+      // If there's already an image in delete section, move it back to right side
+      if (previousImage) {
+        const prevImgId = previousImage.id.replace("dragImg", "");
+        document
+          .getElementById(`imgDiv${prevImgId}`)
+          .appendChild(previousImage);
       }
+
+      imgDeleteDisplay.innerHTML = ""; // Clear previous content
+      previousImage = draggedElement; // Store the new image in delete section
+
+      // Wrap the image inside a div
+      const wrapperDiv = document.createElement("div");
+      wrapperDiv.appendChild(draggedElement);
+
+      // Create delete button
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
+      deleteBtn.style.width = "130px";
+
+      deleteBtn.addEventListener("click", function () {
+        const imgId = draggedElement.id.replace("dragImg", "");
+        const fileInput = document.getElementById(`emptyDiv${imgId}`);
+        const imgPreview = document.getElementById(`imgPreview${imgId}`);
+
+        fileInput.style.display = "block";
+        imgPreview.style.display = "none";
+        imgPreview.innerHTML = "";
+        imgDeleteDisplay.innerHTML = "";
+        previousImage = null;
+      });
+
+      // Create cancel button
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "Cancel";
+      cancelBtn.style.marginLeft = "10px";
+
+      cancelBtn.addEventListener("click", function () {
+        const imgId = draggedElement.id.replace("dragImg", "");
+        document.getElementById(`imgDiv${imgId}`).appendChild(draggedElement);
+        imgDeleteDisplay.innerHTML = "";
+        previousImage = null;
+      });
+
+      // Create resize slider
+      const sizeSlider = document.createElement("input");
+      sizeSlider.setAttribute("type", "range");
+      sizeSlider.setAttribute("min", "50");
+      sizeSlider.setAttribute("max", "200");
+      sizeSlider.setAttribute("value", "150");
+      sizeSlider.style.display = "block";
+      sizeSlider.addEventListener("input", function () {
+        draggedElement.style.width = sizeSlider.value + "px";
+        draggedElement.style.height = sizeSlider.value + "px";
+      });
+
+      imgDeleteDisplay.appendChild(wrapperDiv);
+      imgDeleteDisplay.appendChild(sizeSlider);
+      imgDeleteDisplay.appendChild(deleteBtn);
+      imgDeleteDisplay.appendChild(cancelBtn);
     }
+  }
+  // If dropping back into grid (right)
+  else if (ev.target.classList.contains("img-div-style")) {
+    ev.target.appendChild(draggedElement);
+    previousImage = null; // Reset previous image since it's moved back
   }
 }
 
-// Attach the allowDrop and drop event listeners to the left section
+// Attach event listeners
 imgDeleteDisplay.addEventListener("dragover", allowDrop);
 imgDeleteDisplay.addEventListener("drop", drop);
+contImgsDisplay.addEventListener("dragover", allowDrop);
+contImgsDisplay.addEventListener("drop", drop);
