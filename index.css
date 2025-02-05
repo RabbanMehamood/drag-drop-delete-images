@@ -1,0 +1,83 @@
+.body {
+  box-sizing: border-box;
+}
+
+.input-style {
+  width: 100vw;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 40px;
+}
+.left-section {
+  width: 25%;
+  height: 500px;
+  max-height: 600px;
+  border: 1px solid black;
+}
+/* .right-section {
+  display: grid;
+  flex-wrap: wrap;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 10px;
+  width: 70%;
+  height: 500px;
+  max-height: 600px;
+  border: 1px solid black;
+  overflow: auto;
+  padding: 10px;
+  justify-content: space-around;
+  align-items: center;
+} */
+
+#contImgsDisplay {
+  display: grid;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 70%;
+  height: 500px;
+  max-height: 600px;
+  border: 1px solid black;
+  overflow: auto;
+  padding: 10px;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.btn-style {
+  text-align: center;
+  margin: 20px 0px;
+}
+
+.mainImgsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type="file"] {
+  width: 170px;
+  height: 127px;
+  color: black;
+  text-align: center;
+  border: 1px solid black;
+}
+
+.imgStyle {
+  width: 170px;
+  height: 127px;
+  color: black;
+  border: 1px solid black;
+}
+
+.img-div-style {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: space-around;
+  flex-wrap: wrap;
+  align-items: center;
+}
